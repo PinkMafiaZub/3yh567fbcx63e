@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digit Runner</title>
+<style>
+    body {
+        background-color: #1d1d1d;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: monospace;
+        transition: background-color 0.1s;
+        margin: 0;
+    }
+    .container {
+        background-color: #1d1d1d;
+        border: 1px solid #444;
+        padding: 20px;
+        position: relative;
+        display: inline-block;
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+        clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0% 100%);
+    }
+    .digit-boxes {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+    .box {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #555;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #999;
+        font-size: 18px;
+    }
+    .buttons {
+        display: flex;
+        gap: 10px;
+    }
+    button {
+        background-color: transparent;
+        border: 1px solid #555;
+        color: #999;
+        padding: 5px 15px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    button:hover {
+        border-color: #aaa;
+        color: #fff;
+    }
+    .lock {
+        position: absolute;
+        left: -20px;
+        top: 0;
+        color: #777;
+    }
+    video {
+        display: none;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        background: black;
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+</style>
+</head>
+<body>
+
+<div class="container" id="game">
+    <div class="digit-boxes">
+        <div class="box" id="box0"></div>
+        <div class="box" id="box1"></div>
+        <div class="box" id="box2"></div>
+        <div class="box" id="box3"></div>
+        <div class="box" id="box4"></div>
+        <div class="box" id="box5"></div>
+    </div>
+    <div class="buttons">
+        <button id="setBtn">SET</button>
+        <button id="goBtn">GO</button>
+    </div>
+</div>
+
+<video id="video" src="buuu.mp4" autoplay></video>
+
+<script>
+    let currentBox = 0;
+    let interval;
+
+    function startBox(index) {
+        let num = 1;
+        clearInterval(interval);
+        interval = setInterval(() => {
+            document.getElementById(`box${index}`).textContent = num;
+            num = num === 9 ? 1 : num + 1;
+        }, 600);
+    }
+
+    function resetBoxes() {
+        clearInterval(interval);
+        for (let i = 0; i < 6; i++) {
+            document.getElementById(`box${i}`).textContent = "";
+        }
+        currentBox = 0;
+        startBox(0);
+    }
+
+    window.addEventListener("load", () => {
+        startBox(0);
+    });
+
+    document.getElementById("setBtn").addEventListener("click", () => {
+        clearInterval(interval);
+        currentBox++;
+        if (currentBox < 6) {
+            startBox(currentBox);
+        }
+    });
+
+    document.getElementById("goBtn").addEventListener("click", () => {
+        let password = "";
+        for (let i = 0; i < 6; i++) {
+            password += document.getElementById(`box${i}`).textContent || "";
+        }
+
+        if (password === "314696") {
+            let colors = ["red", "blue"];
+            let i = 0;
+            let blink = setInterval(() => {
+                document.body.style.backgroundColor = colors[i % 2];
+                i++;
+            }, 200);
+
+            setTimeout(() => {
+                clearInterval(blink);
+                document.body.style.backgroundColor = "black";
+                document.getElementById("game").style.display = "none";
+                
+                const vid = document.getElementById("video");
+                vid.style.display = "block";
+                vid.play();
+
+                // Запуск в полноэкранный режим
+                if (vid.requestFullscreen) {
+                    vid.requestFullscreen();
+                } else if (vid.webkitRequestFullscreen) {
+                    vid.webkitRequestFullscreen();
+                } else if (vid.msRequestFullscreen) {
+                    vid.msRequestFullscreen();
+                }
+
+            }, 2000);
+        } else {
+            resetBoxes();
+        }
+    });
+</script>
+
+</body>
+</html>
